@@ -6,7 +6,7 @@ class DieNSolver:
     def __init__(self):
         pass
 
-    def find_optimal_policy(self, bad_side_vector):
+    def find_optimal_policy_value(self, bad_side_vector):
         optimal_policy, expected_values = self._calculate_states(bad_side_vector)
         return float("%.5f" % expected_values[0])
 
