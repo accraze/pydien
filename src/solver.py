@@ -1,4 +1,5 @@
 import numpy as np
+import mdptoolbox
 
 class DieNSolver:
 
@@ -6,13 +7,15 @@ class DieNSolver:
         pass
 
     def find_optimal_policy(self, bad_side_vector):
-        self._calculate_states(bad_side_vector)
+        optimal_policy, expected_values = self._calculate_states(bad_side_vector)
+        return float("%.5f" % expected_values[0])
 
     def _calculate_states(self, bad_side_vector):
         self._load_good_index(bad_side_vector)
         self._initialize_states(bad_side_vector)
         self._initialize_rewards()
         self._build_arrays()
+        return self._calculate_value_iteration()
 
     def _load_good_index(self, bad_side_vector):
         self.good_indicies = []
@@ -66,4 +69,18 @@ class DieNSolver:
             self.T_quit_row = np.zeros(self.max_states_n)
             self.T_quit_row[self.max_states_n - 1] = 1.0
             self.T_quit[row] = self.T_quit_row
+
+    def _calculate_value_iteration(self):
+        self.T[0] = self.T_roll
+        self.T[1] = self.T_quit
+        self.R[0] = self.R_roll
+        self.R[1] = self.R_quit
+        
+        vi = mdptoolbox.mdp.ValueIteration(self.T, self.R, 1.0)
+        vi.run()
+        
+        optimal_policy = vi.policy
+        expected_values = vi.V
+        print(optimal_policy, expected_values)
+        return optimal_policy, expected_values
 
